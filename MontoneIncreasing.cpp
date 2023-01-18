@@ -1,45 +1,42 @@
- #include<bits/stdc++.h>
- using namespace std;
- 
- class Solution {
+#include<bits/stdc++.h>
+using namespace std;
+
+class Solution {
 public:
-/* own approach ::
-we have three choices ==> all 0's,all 1's or (0's and 1's)
-out of these choices take min of them.
+/* two cases possible
+1. maxsub sum is in non-circular array ->kadanes algo
+2. maxsub sum is in circular array -> (totalsum - minsum of non-cir array)
 
-for third case : 0's followed by 1's
-we will try out all possible strings that we can make
-
-for each idx i, we will form a string that has all zeros till "i'th" idx(including i idx) 
-and all 1's after i'th idx.
-
-flips req. for each such oprn = no. of 1's till i'th idx[including i'th idx] +
-                                no. of 0's after i'th idx.
-
-try all possible ways and take min. of all cases.
+return max of above two cases.
 */
-    int minFlipsMonoIncr(string s) {
-        unordered_map<char,int> cnt;
-        for(char &ch: s) cnt[ch]++;
+    int maxSubarraySumCircular(vector<int>& nums) {
+        int n=nums.size();
 
-        int ans=min(cnt['0'],cnt['1']);
-        
-        int ones=0;//rep cnt of ones till "ith" idx
-        for(int i=0; i<s.length(); i++){
-            int flips=0;
-            
-            if(s[i] == '1') ones++;
+        int maxsum=INT_MIN,minsum=INT_MAX;
+        int totalsum=0;
+        int cursum1=0;//rep. cur max sum
+        int cursum2=0;//rep. cur min sum
 
-            //update map : we basically care about no. of 0's after ith idx
-            //cnt['0'] tells us no. of 0's after i'th idx
-            if(s[i] == '0') cnt[s[i]]--;
+        for(int x: nums){
+             totalsum += x;
 
-            //make cur char 0 if it is one, and all zeros after ith idx to ones
-            flips += (ones + cnt['0']);
+             //max sum caln
+             cursum1 += x;
+             maxsum = max(maxsum,cursum1);
+             if(cursum1 < 0) cursum1=0;
 
-            ans = min(ans,flips);
+             //min sum caln
+             cursum2 += x;
+             minsum = min(minsum,cursum2);
+             if(cursum2 > 0) cursum2=0;
         }
-        
-        return ans;
+
+        //if all no.s are -ve
+        if(totalsum - minsum == 0) return maxsum;
+
+        return max(maxsum,totalsum - minsum);
     }
 };
+
+
+ 
